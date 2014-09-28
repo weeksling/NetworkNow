@@ -37,11 +37,29 @@ exports = module.exports = function(app) {
 	
 	// Views
 	app.get('/', routes.views.index);
-	app.get('/blog/:category?', routes.views.blog);
-	app.get('/blog/post/:post', routes.views.post);
-	app.get('/gallery', routes.views.gallery);
-	app.all('/contact', routes.views.contact);
-	
+	app.get('/session/:username', routes.views.getSession);
+	app.get('/matches/:username', routes.views.getMatches);
+	app.put('/hotspot/:uid/username/:username', routes.views.putHotspot);
+
+	app.get('/hotspot/:uid', function(req, res){
+		var params = req.params;
+		var uid = params.uid;
+		keystone.list('hotspots')
+		.model
+		.findOne()
+		.where('uid').equals(uid)
+		.exec(function(err, found){
+			res.status(200).send(found);
+		});
+	});
+	app.get('/users', function(req, res){
+		keystone.list('users')
+		.model
+		.find()
+		.exec(function(err, found){
+			res.status(200).send(found);
+		});
+	});
 	// NOTE: To protect a route so that only admins can see it, use the requireUser middleware:
 	// app.get('/protected', middleware.requireUser, routes.views.protected);
 	
